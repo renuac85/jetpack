@@ -58,6 +58,8 @@ export type AiExcerptControlProps = {
 
 	model?: AiModelTypeProp;
 	onModelChange?: ( model: AiModelTypeProp ) => void;
+
+	help?: string | React.ReactNode | null;
 };
 
 import './style.scss';
@@ -78,15 +80,14 @@ export function AiExcerptControl( {
 
 	model,
 	onModelChange,
+
+	help,
 }: AiExcerptControlProps ) {
 	const [ isSettingActive, setIsSettingActive ] = React.useState( false );
 
 	function toggleSetting() {
 		setIsSettingActive( prev => ! prev );
 	}
-
-	// const langLabel = language || __( 'Language', 'jetpack' );
-	// const toneLabel = tone || __( 'Tone', 'jetpack' );
 
 	const lang = language?.split( ' ' )[ 0 ];
 	const langLabel = LANGUAGE_MAP[ lang ]?.label || __( 'Language', 'jetpack' );
@@ -96,7 +97,7 @@ export function AiExcerptControl( {
 		<div className="jetpack-ai-generate-excerpt-control">
 			<BaseControl
 				className="jetpack-ai-generate-excerpt-control__header"
-				label={ __( 'Settings', 'jetpack' ) }
+				label={ __( 'AI settings', 'jetpack' ) }
 			>
 				<Button
 					label={ __( 'Advanced AI options', 'jetpack' ) }
@@ -132,10 +133,13 @@ export function AiExcerptControl( {
 				onChange={ onWordsNumberChange }
 				min={ minWords }
 				max={ maxWords }
-				help={ __(
-					'Sets the desired length in words for the auto-generated excerpt. The final count may vary due to how AI works.',
-					'jetpack'
-				) }
+				help={
+					help ||
+					__(
+						'The actual length may vary as the AI strives to generate coherent and meaningful content',
+						'jetpack'
+					)
+				}
 				showTooltip={ false }
 				disabled={ disabled }
 			/>
