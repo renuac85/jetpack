@@ -3,6 +3,7 @@ import { ExternalLink } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import Button from 'components/button';
+import Card from 'components/card';
 import FoldableCard from 'components/foldable-card';
 import { FormFieldset, FormLabel } from 'components/forms';
 import { createNotice, removeNotice } from 'components/global-notices/state/notices/actions';
@@ -12,7 +13,7 @@ import SettingsCard from 'components/settings-card';
 import SettingsGroup from 'components/settings-group';
 import {
 	getJetpackProductUpsellByFeature,
-	FEATURE_SECURITY_SCANNING_JETPACK,
+	FEATURE_WEB_APPLICATION_FIREWALL_JETPACK,
 } from 'lib/plans/constants';
 import { getProductDescriptionUrl } from 'product-descriptions/utils';
 import React, { Component } from 'react';
@@ -22,7 +23,10 @@ import QueryWafSettings from '../components/data/query-waf-bootstrap-path';
 import InfoPopover from '../components/info-popover';
 import { ModuleToggle } from '../components/module-toggle';
 import Textarea from '../components/textarea';
+import { getSiteAdminUrl } from '../state/initial-state';
+import { isFeatureActive } from '../state/recommendations';
 import { getSetting } from '../state/settings/reducer';
+import { isFetchingPluginsData } from '../state/site/plugins';
 import { updateWafSettings, updateWafIpAllowList } from '../state/waf/actions';
 import {
 	getAutomaticRulesAvailable,
@@ -422,18 +426,59 @@ export const Waf = class extends Component {
 						</InfoPopover>
 					</>
 				}
-				eventFeature="scan"
-				plan={ getJetpackProductUpsellByFeature( FEATURE_SECURITY_SCANNING_JETPACK ) }
+				eventFeature="protect"
+				plan={ getJetpackProductUpsellByFeature( FEATURE_WEB_APPLICATION_FIREWALL_JETPACK ) }
 				feature="jetpack_scan"
-				href={ this.props.scanUpgradeUrl }
+				href={ this.props.protectUpgradeUrl }
 				rna
 			/>
 		);
 
+		// Loading...
+		if ( this.props.isFetchingPluginsData ) {
+			return null;
+		}
+
+		// Redirect users with Jetpack Protect already installed to the standalone plugin's settings page.
+		if ( this.props.protectIsActive ) {
+			return (
+				<SettingsCard header={ 'Firewall' } module="waf" hideButton={ true }>
+					<Card compact href={ this.props.protectAdminUrl }>
+						{ __(
+							'Manage your Web Application Firewall settings in the Protect dashboard',
+							'jetpack'
+						) }
+					</Card>
+				</SettingsCard>
+			);
+		}
+
+		// Require Jetpack Protect for new activations.
+		if ( ! isWafActive ) {
+			return (
+				<SettingsCard header={ moduleHeader } module="waf" hideButton={ true }>
+					<JetpackBanner
+						callToAction={ _x(
+							'Activate',
+							'Call to action to activate Jetpack Protect',
+							'jetpack'
+						) }
+						title={ __( "Protect your site with Jetpack's Web Application Firewall.", 'jetpack' ) }
+						eventFeature="protect"
+						plan={ getJetpackProductUpsellByFeature( FEATURE_WEB_APPLICATION_FIREWALL_JETPACK ) }
+						feature="jetpack_scan"
+						href={ this.props.protectUpgradeUrl }
+						rna
+					/>
+				</SettingsCard>
+			);
+		}
+
+		// (Legacy) Provide firewall settings for users with the firewall module enabled, but without Jetpack Protect installed.
 		return (
 			<SettingsCard
 				{ ...this.props }
-				header={ moduleHeader }
+				header="Firewall"
 				module="waf"
 				onSubmit={ this.onSubmit }
 				hideButton={ true }
@@ -489,7 +534,10 @@ export default connect(
 			isFetchingSettings: isFetchingWafSettings( state ),
 			isUpdatingWafSettings: isUpdatingWafSettings( state ),
 			settings: getWafSettings( state ),
-			scanUpgradeUrl: getProductDescriptionUrl( state, 'scan' ),
+			isFetchingPluginsData: isFetchingPluginsData( state ),
+			protectIsActive: isFeatureActive( state, 'protect' ),
+			protectUpgradeUrl: getProductDescriptionUrl( state, 'protect' ),
+			protectAdminUrl: `${ getSiteAdminUrl( state ) }admin.php?page=jetpack-protect#/firewall`,
 			sitePlan,
 		};
 	},
