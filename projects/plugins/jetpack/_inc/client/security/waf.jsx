@@ -14,6 +14,7 @@ import SettingsGroup from 'components/settings-group';
 import {
 	getJetpackProductUpsellByFeature,
 	FEATURE_WEB_APPLICATION_FIREWALL_JETPACK,
+	PLAN_JETPACK_SCAN,
 } from 'lib/plans/constants';
 import { getProductDescriptionUrl } from 'product-descriptions/utils';
 import React, { Component } from 'react';
@@ -22,6 +23,7 @@ import { getSitePlan, siteHasFeature } from 'state/site';
 import QueryWafSettings from '../components/data/query-waf-bootstrap-path';
 import InfoPopover from '../components/info-popover';
 import { ModuleToggle } from '../components/module-toggle';
+import PlanIcon from '../components/plans/plan-icon';
 import Textarea from '../components/textarea';
 import { getSiteAdminUrl } from '../state/initial-state';
 import { isFeatureActive } from '../state/recommendations';
@@ -48,6 +50,7 @@ export const Waf = class extends Component {
 		ipBlockList: this.props.settings?.ipBlockList,
 		ipAllowList: this.props.settings?.ipAllowList,
 		shareData: this.props.settings?.shareData,
+		showLegacySettings: false,
 	};
 
 	/**
@@ -183,6 +186,10 @@ export const Waf = class extends Component {
 			},
 			this.onSubmit
 		);
+	};
+
+	showLegacySettings = () => {
+		this.setState( { showLegacySettings: true } );
 	};
 
 	render() {
@@ -434,51 +441,75 @@ export const Waf = class extends Component {
 			/>
 		);
 
+		let protectBannerTitle = __(
+			"Protect your site with Jetpack's Web Application Firewall.",
+			'jetpack'
+		);
+		if ( this.props.protectIsActive ) {
+			protectBannerTitle = __(
+				'Manage your Web Application Firewall settings in the Protect dashboard.',
+				'jetpack'
+			);
+		} else if ( isWafActive ) {
+			protectBannerTitle = __(
+				'Unlock access to a dedicated Firewall dashboard by activating Jetpack Protect.',
+				'jetpack'
+			);
+		}
+		const activateProtectBanner = (
+			<Card className="dops-banner has-call-to-action">
+				<div className="dops-banner__icon-plan">
+					<PlanIcon plan={ PLAN_JETPACK_SCAN } />
+				</div>
+				<div className="dops-banner__content">
+					<div className="dops-banner__info">
+						<div className="dops-banner__title">{ protectBannerTitle }</div>
+					</div>
+					{ this.props.protectIsActive && (
+						<div className="dops-banner__action">
+							<Button rna={ true } compact href={ this.props.protectAdminUrl } primary>
+								{ __( 'Open Firewall Settings', 'jetpack' ) }
+							</Button>
+						</div>
+					) }
+					{ ! this.props.protectIsActive && (
+						<div className="dops-banner__action">
+							<Button rna={ true } compact href={ this.props.protectUpgradeUrl } primary>
+								{ __( 'Activate', 'jetpack' ) }
+							</Button>
+						</div>
+					) }
+					{ ! this.props.protectIsActive && ! this.state.showLegacySettings && (
+						<div className="dops-banner__action">
+							<Button rna={ true } compact onClick={ this.showLegacySettings }>
+								{ __( 'Use Legacy Settings', 'jetpack' ) }
+							</Button>
+						</div>
+					) }
+				</div>
+			</Card>
+		);
+
 		// Loading...
 		if ( this.props.isFetchingPluginsData ) {
 			return null;
 		}
 
-		// Redirect users with Jetpack Protect already installed to the standalone plugin's settings page.
-		if ( this.props.protectIsActive ) {
-			return (
-				<SettingsCard header={ 'Firewall' } module="waf" hideButton={ true }>
-					<Card compact href={ this.props.protectAdminUrl }>
-						{ __(
-							'Manage your Web Application Firewall settings in the Protect dashboard',
-							'jetpack'
-						) }
-					</Card>
-				</SettingsCard>
-			);
-		}
-
-		// Require Jetpack Protect for new activations.
-		if ( ! isWafActive ) {
+		// Direct users to use Jetpack Protect to manage firewall settings.
+		if ( ! this.props.showLegacySettings ) {
 			return (
 				<SettingsCard header={ moduleHeader } module="waf" hideButton={ true }>
-					<JetpackBanner
-						callToAction={ _x(
-							'Activate',
-							'Call to action to activate Jetpack Protect',
-							'jetpack'
-						) }
-						title={ __( "Protect your site with Jetpack's Web Application Firewall.", 'jetpack' ) }
-						eventFeature="protect"
-						plan={ getJetpackProductUpsellByFeature( FEATURE_WEB_APPLICATION_FIREWALL_JETPACK ) }
-						feature="jetpack_scan"
-						href={ this.props.protectUpgradeUrl }
-						rna
-					/>
+					{ isWafActive && <QueryWafSettings /> }
+					{ activateProtectBanner }
 				</SettingsCard>
 			);
 		}
 
-		// (Legacy) Provide firewall settings for users with the firewall module enabled, but without Jetpack Protect installed.
+		// Display legacy settings.
 		return (
 			<SettingsCard
 				{ ...this.props }
-				header="Firewall"
+				header={ moduleHeader }
 				module="waf"
 				onSubmit={ this.onSubmit }
 				hideButton={ true }
@@ -513,7 +544,9 @@ export const Waf = class extends Component {
 					) }
 				</SettingsGroup>
 				{ isWafActive && this.props.bootstrapPath && bootstrapInstructions }
-				{ ! this.props.hasScan && ! this.props.isFetchingSettings && upgradeBanner }
+				{ ! this.props.hasScan && ! this.props.isFetchingSettings
+					? upgradeBanner
+					: activateProtectBanner }
 			</SettingsCard>
 		);
 	}
