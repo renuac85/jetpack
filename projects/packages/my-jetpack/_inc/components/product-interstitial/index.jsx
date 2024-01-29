@@ -45,6 +45,7 @@ import videoPressImage from './videopress.png';
  * @param {number} [props.quantity]              - The quantity of the product to purchase
  * @param {number} [props.directCheckout]        - Whether to go straight to the checkout page, e.g. for products with usage tiers
  * @param {boolean} [props.highlightLastFeature] - Whether to highlight the last feature in the list of features
+ * @param {string} [props.postActivationUrl]     - URL to redirect to after activation
  * @returns {object}                               ProductInterstitial react component.
  */
 export default function ProductInterstitial( {
@@ -61,6 +62,7 @@ export default function ProductInterstitial( {
 	quantity = null,
 	directCheckout = false,
 	highlightLastFeature = false,
+	postActivationUrl,
 } ) {
 	const { activate, detail } = useProduct( slug );
 	const { isUpgradableByBundle, tiers } = detail;
@@ -96,7 +98,6 @@ export default function ProductInterstitial( {
 			}
 
 			activate().finally( () => {
-				const postActivationUrl = product?.postActivationUrl;
 				const hasRequiredPlan = tier
 					? product?.hasRequiredTier?.[ tier ]
 					: product?.hasRequiredPlan;
@@ -115,8 +116,9 @@ export default function ProductInterstitial( {
 
 				// If no purchase is needed, redirect the user to the product screen.
 				if ( ! needsPurchase ) {
-					if ( postActivationUrl ) {
-						window.location.href = postActivationUrl;
+					const redirectUrl = postActivationUrl || product?.postActivationUrl;
+					if ( redirectUrl ) {
+						window.location.href = redirectUrl;
 						return;
 					}
 
@@ -128,7 +130,7 @@ export default function ProductInterstitial( {
 				checkout?.();
 			} );
 		},
-		[ directCheckout, activate, navigateToMyJetpackOverviewPage ]
+		[ directCheckout, activate, postActivationUrl, navigateToMyJetpackOverviewPage ]
 	);
 
 	return (
@@ -160,8 +162,8 @@ export default function ProductInterstitial( {
 					{ tiers && tiers.length ? (
 						<ProductDetailTable
 							slug={ slug }
-							clickHandler={ clickHandler }
 							onProductButtonClick={ clickHandler }
+							postActivationUrl={ postActivationUrl }
 							trackProductButtonClick={ trackProductClick }
 						/>
 					) : (
@@ -337,10 +339,18 @@ export function JetpackAIInterstitial() {
 /**
  * ProtectInterstitial component
  *
+ * @param {object} props                    - Component props.
+ * @param {string} props.postActivationUrl  - Post activation URL.
  * @returns {object} ProtectInterstitial react component.
  */
-export function ProtectInterstitial() {
-	return <ProductInterstitial slug="protect" installsPlugin={ true } />;
+export function ProtectInterstitial( { postActivationUrl } ) {
+	return (
+		<ProductInterstitial
+			slug="protect"
+			installsPlugin={ true }
+			postActivationUrl={ postActivationUrl }
+		/>
+	);
 }
 
 /**

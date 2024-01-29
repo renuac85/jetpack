@@ -25,6 +25,7 @@ import { useProduct } from '../../hooks/use-product';
  * @param {object}   props                         - Component props.
  * @param {boolean}  props.cantInstallPlugin       - True when the plugin cannot be automatically installed.
  * @param {Function} props.onProductButtonClick    - Click handler for the product button.
+ * @param {string}   props.postActivationUrl       - Override the product's post-activation URL.
  * @param {object}   props.detail                  - Product detail object.
  * @param {string}   props.tier                    - Product tier slug, i.e. 'free' or 'upgraded'.
  * @param {Function} props.trackProductButtonClick - Tracks click event for the product button.
@@ -33,6 +34,7 @@ import { useProduct } from '../../hooks/use-product';
 const ProductDetailTableColumn = ( {
 	cantInstallPlugin,
 	onProductButtonClick,
+	postActivationUrl,
 	detail,
 	tier,
 	trackProductButtonClick,
@@ -44,7 +46,7 @@ const ProductDetailTableColumn = ( {
 		featuresByTier = [],
 		pricingForUi: { tiers: tiersPricingForUi },
 		title,
-		postActivationUrl,
+		postActivationUrl: productPostActivationUrl,
 	} = detail;
 
 	// Extract the pricing details for the provided tier.
@@ -61,7 +63,10 @@ const ProductDetailTableColumn = ( {
 	const { run: runCheckout, hasCheckoutStarted } = useProductCheckoutWorkflow( {
 		from: 'my-jetpack',
 		productSlug: wpcomProductSlug,
-		redirectUrl: postActivationUrl.replace( /(^.*\/wp-admin\/)/i, '' ) || myJetpackCheckoutUri,
+		redirectUrl:
+			postActivationUrl.replace( /(^.*\/wp-admin\/)/i, '' ) ||
+			productPostActivationUrl.replace( /(^.*\/wp-admin\/)/i, '' ) ||
+			myJetpackCheckoutUri,
 		connectAfterCheckout: true,
 		siteSuffix,
 		useBlogIdSuffix: true,
@@ -184,10 +189,16 @@ ProductDetailTableColumn.propTypes = {
  * @param {object}   props                         - Component props.
  * @param {string}   props.slug                    - Product slug.
  * @param {Function} props.onProductButtonClick    - Click handler for the product button.
+ * @param {object}   props.postActivationUrl       - Override the product's post-activation URL.
  * @param {Function} props.trackProductButtonClick - Tracks click event for the product button.
  * @returns {object} - ProductDetailTable react component.
  */
-const ProductDetailTable = ( { slug, onProductButtonClick, trackProductButtonClick } ) => {
+const ProductDetailTable = ( {
+	slug,
+	onProductButtonClick,
+	postActivationUrl,
+	trackProductButtonClick,
+} ) => {
 	const { fileSystemWriteAccess } = window?.myJetpackInitialState ?? {};
 
 	const { detail } = useProduct( slug );
@@ -247,6 +258,7 @@ const ProductDetailTable = ( { slug, onProductButtonClick, trackProductButtonCli
 						key={ index }
 						tier={ tier }
 						detail={ detail }
+						postActivationUrl={ postActivationUrl }
 						onProductButtonClick={ onProductButtonClick }
 						trackProductButtonClick={ trackProductButtonClick }
 						primary={ index === 0 }
@@ -261,6 +273,7 @@ const ProductDetailTable = ( { slug, onProductButtonClick, trackProductButtonCli
 ProductDetailTable.propTypes = {
 	slug: PropTypes.string.isRequired,
 	onProductButtonClick: PropTypes.func.isRequired,
+	postActivationUrl: PropTypes.string,
 	trackProductButtonClick: PropTypes.func.isRequired,
 };
 

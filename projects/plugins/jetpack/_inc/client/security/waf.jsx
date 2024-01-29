@@ -496,7 +496,7 @@ export const Waf = class extends Component {
 		}
 
 		// Direct users to use Jetpack Protect to manage firewall settings.
-		if ( ! this.props.showLegacySettings ) {
+		if ( ! this.state.showLegacySettings ) {
 			return (
 				<SettingsCard header={ moduleHeader } module="waf" hideButton={ true }>
 					{ isWafActive && <QueryWafSettings /> }
