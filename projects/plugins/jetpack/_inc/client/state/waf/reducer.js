@@ -26,6 +26,7 @@ export const data = ( state = {}, action ) => {
 						: state.allowListInputState,
 				ipBlockList: action.settings?.jetpack_waf_ip_block_list || '',
 				shareData: Boolean( action.settings?.jetpack_waf_share_data ),
+				shareDebugData: Boolean( action.settings?.jetpack_waf_share_debug_data ),
 			} );
 		case WAF_IP_ALLOW_LIST_UPDATED:
 			return assign( {}, state, {
