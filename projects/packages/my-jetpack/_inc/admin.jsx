@@ -62,7 +62,7 @@ const MyJetpack = () => (
 				<Route path="/add-extras" element={ <ExtrasInterstitial /> } />
 				<Route path="/add-protect" element={ <ProtectInterstitial /> } />
 				<Route
-					path="/add-protect-firewall"
+					path="/add-firewall"
 					element={ <ProtectInterstitial postActivationUrl="firewall" /> }
 				/>
 				<Route path="/add-scan" element={ <ScanInterstitial /> } />

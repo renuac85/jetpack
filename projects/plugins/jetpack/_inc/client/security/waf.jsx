@@ -16,7 +16,6 @@ import {
 	FEATURE_WEB_APPLICATION_FIREWALL_JETPACK,
 	PLAN_JETPACK_SCAN,
 } from 'lib/plans/constants';
-import { getProductDescriptionUrl } from 'product-descriptions/utils';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getSitePlan, siteHasFeature } from 'state/site';
@@ -569,7 +568,7 @@ export default connect(
 			settings: getWafSettings( state ),
 			isFetchingPluginsData: isFetchingPluginsData( state ),
 			protectIsActive: isFeatureActive( state, 'protect' ),
-			protectUpgradeUrl: getProductDescriptionUrl( state, 'protect' ),
+			protectUpgradeUrl: `${ getSiteAdminUrl( state ) }admin.php?page=my-jetpack#/add-firewall`,
 			protectAdminUrl: `${ getSiteAdminUrl( state ) }admin.php?page=jetpack-protect#/firewall`,
 			sitePlan,
 		};
