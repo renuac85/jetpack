@@ -45,7 +45,7 @@ import videoPressImage from './videopress.png';
  * @param {number} [props.quantity]              - The quantity of the product to purchase
  * @param {number} [props.directCheckout]        - Whether to go straight to the checkout page, e.g. for products with usage tiers
  * @param {boolean} [props.highlightLastFeature] - Whether to highlight the last feature in the list of features
- * @param {string} [props.postActivationUrl]     - URL to redirect to after activation
+ * @param {string} [props.postActivationUrl]     - Custom URL to redirect to after activation
  * @returns {object}                               ProductInterstitial react component.
  */
 export default function ProductInterstitial( {
@@ -339,16 +339,27 @@ export function JetpackAIInterstitial() {
 /**
  * ProtectInterstitial component
  *
- * @param {object} props                    - Component props.
- * @param {string} props.postActivationUrl  - Post activation URL.
  * @returns {object} ProtectInterstitial react component.
  */
-export function ProtectInterstitial( { postActivationUrl } ) {
+export function ProtectInterstitial() {
+	return <ProductInterstitial slug="protect" installsPlugin={ true } />;
+}
+
+/**
+ * FirewallInterstitial component
+ *
+ * @returns {object} FirewallInterstitial react component.
+ */
+export function FirewallInterstitial() {
+	const {
+		detail: { manageUrl },
+	} = useProduct( 'protect' );
+
 	return (
 		<ProductInterstitial
 			slug="protect"
 			installsPlugin={ true }
-			postActivationUrl={ postActivationUrl }
+			postActivationUrl={ `${ manageUrl }#/firewall` }
 		/>
 	);
 }
