@@ -64,8 +64,8 @@ const ProductDetailTableColumn = ( {
 		from: 'my-jetpack',
 		productSlug: wpcomProductSlug,
 		redirectUrl:
-			postActivationUrl.replace( /(^.*\/wp-admin\/)/i, '' ) ||
-			productPostActivationUrl.replace( /(^.*\/wp-admin\/)/i, '' ) ||
+			postActivationUrl?.replace( /(^.*\/wp-admin\/)/i, '' ) ||
+			productPostActivationUrl?.replace( /(^.*\/wp-admin\/)/i, '' ) ||
 			myJetpackCheckoutUri,
 		connectAfterCheckout: true,
 		siteSuffix,
