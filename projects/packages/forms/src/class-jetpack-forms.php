@@ -30,7 +30,7 @@ class Jetpack_Forms {
 			$dashboard->init();
 		}
 
-		if ( is_admin() && apply_filters( 'tmp_grunion_allow_editor_view', true ) ) {
+		if ( is_admin() ) {
 			add_action( 'current_screen', '\Automattic\Jetpack\Forms\ContactForm\Editor_View::add_hooks' );
 		}
 

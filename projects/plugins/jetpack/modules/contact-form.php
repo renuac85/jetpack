@@ -37,18 +37,7 @@ if ( apply_filters( 'jetpack_contact_form_use_package', true ) ) {
 
 require_once __DIR__ . '/contact-form/grunion-contact-form.php';
 
-/*
- * Filters if the new Contact Form Editor View should be used.
- *
- * A temporary filter to disable the new Editor View for the older UI.
- * Please note this filter and the old UI will be removed in the future.
- * Expected to be removed in Jetpack 5.8 or if a security issue merits removing the old code sooner.
- *
- * @since 5.2.0
- *
- * @param boolean $view Use new Editor View. Default true.
- */
-if ( is_admin() && apply_filters( 'tmp_grunion_allow_editor_view', true ) ) {
+if ( is_admin() ) {
 	require_once __DIR__ . '/contact-form/grunion-editor-view.php';
 }
 
