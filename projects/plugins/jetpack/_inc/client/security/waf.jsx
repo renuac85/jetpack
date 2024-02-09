@@ -62,6 +62,7 @@ export const Waf = class extends Component {
 				ipBlockList: this.props.settings?.ipBlockList,
 				ipAllowList: this.props.settings?.ipAllowList,
 				shareData: this.props.settings?.shareData,
+				shareDebugData: this.props.settings?.shareDebugData,
 			} );
 		}
 
@@ -347,7 +348,7 @@ export const Waf = class extends Component {
 							>
 								{ createInterpolateElement(
 									__(
-										'Allow Jetpack to collect data of blocked requests to improve Firewall protection and rules. <ExternalLink>Learn more</ExternalLink> <hr /> <ExternalLink>Privacy Information</ExternalLink>',
+										'Allow Jetpack to collect basic data of blocked requests to improve Firewall protection and rules. <ExternalLink>Learn more</ExternalLink> <hr /> <ExternalLink>Privacy Information</ExternalLink>',
 										'jetpack'
 									),
 									{
