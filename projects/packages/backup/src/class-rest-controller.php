@@ -15,6 +15,7 @@ namespace Automattic\Jetpack\Backup\V0002;
 use Automattic\Jetpack\Connection\Client;
 use Automattic\Jetpack\Connection\Rest_Authentication;
 use Automattic\Jetpack\Sync\Actions as Sync_Actions;
+use Automattic\Jetpack\Sync\Modules\WooCommerce_HPOS_Orders;
 use Jetpack_Options;
 use WP_Error;
 use WP_REST_Request;
@@ -207,6 +208,17 @@ class REST_Controller {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => __CLASS__ . '::get_site_backup_undo_event',
 				'permission_callback' => __NAMESPACE__ . '\Jetpack_Backup::backups_permissions_callback',
+			)
+		);
+
+		// Fetch a backup of a wc_order along with all of its data.
+		register_rest_route(
+			'jetpack/v4',
+			'/orders/(?P<id>\d+)/backup',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => __CLASS__ . '::fetch_wc_orders_backup',
+				'permission_callback' => __CLASS__ . '::backup_permissions_callback',
 			)
 		);
 	}
@@ -614,6 +626,33 @@ class REST_Controller {
 		}
 
 		return rest_ensure_response( $undo_event );
+	}
+
+	/**
+	 * Fetch a backup of a order, along with all of its data.
+	 *
+	 * @access public
+	 * @static
+	 *
+	 * @param WP_REST_Request $request The request sent to the WP REST API.
+	 *
+	 * @return array
+	 */
+	public static function fetch_wc_orders_backup( $request ) {
+
+		// Disable Sync as this is a read-only operation and triggered by sync activity.
+		Sync_Actions::mark_sync_read_only();
+
+		$order_id = $request['id'];
+		$order    = WooCommerce_HPOS_Orders::get_object_by_id( $order_id );
+
+		if ( empty( $order ) ) {
+			return new WP_Error( 'order_not_found', __( 'Order not found', 'jetpack-backup-pkg' ), array( 'status' => 404 ) );
+		}
+
+		return array(
+			'order' => (array) $order,
+		);
 	}
 
 	/**
