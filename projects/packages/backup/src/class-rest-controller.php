@@ -644,7 +644,7 @@ class REST_Controller {
 		Sync_Actions::mark_sync_read_only();
 
 		$order_id = $request['id'];
-		$order    = WooCommerce_HPOS_Orders::get_object_by_id( $order_id );
+		$order    = WooCommerce_HPOS_Orders::get_object_by_id( 'order', $order_id );
 
 		if ( empty( $order ) ) {
 			return new WP_Error( 'order_not_found', __( 'Order not found ', 'jetpack-backup-pkg' ), array( 'status' => 404 ) );
