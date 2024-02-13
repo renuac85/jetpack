@@ -214,7 +214,7 @@ class REST_Controller {
 		// Fetch a backup of a wc_order along with all of its data.
 		register_rest_route(
 			'jetpack/v4',
-			'/wc-orders/(?P<id>\d+)/backup',
+			'/orders/(?P<id>\d+)/backup',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => __CLASS__ . '::fetch_wc_orders_backup',
