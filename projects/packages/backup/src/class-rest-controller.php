@@ -214,7 +214,7 @@ class REST_Controller {
 		// Fetch a backup of a wc_order along with all of its data.
 		register_rest_route(
 			'jetpack/v4',
-			'/orders/(?P<id>\d+)/backup',
+			'/wc_orders/(?P<id>\d+)/backup',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => __CLASS__ . '::fetch_wc_orders_backup',
@@ -647,7 +647,7 @@ class REST_Controller {
 		$order    = WooCommerce_HPOS_Orders::get_object_by_id( $order_id );
 
 		if ( empty( $order ) ) {
-			return new WP_Error( 'order_not_found', __( 'Order not found', 'jetpack-backup-pkg' ), array( 'status' => 404 ) );
+			return new WP_Error( 'order_not_found', __( 'Order not found ', 'jetpack-backup-pkg' ), array( 'status' => 404 ) );
 		}
 
 		return array(
