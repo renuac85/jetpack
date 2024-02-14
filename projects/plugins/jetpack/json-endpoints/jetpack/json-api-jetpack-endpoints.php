@@ -1257,6 +1257,32 @@ new Jetpack_JSON_API_Get_Post_Backup_Endpoint(
 	)
 );
 
+// GET /sites/%s/orders/%d/backup
+require_once $json_jetpack_endpoints_dir . 'class.jetpack-json-api-get-wc-order-backup-endpoint.php';
+new Jetpack_JSON_API_Get_WC_Order_Backup_Endpoint(
+	array(
+		'description'             => 'Fetch a backup of a order, along with all its data',
+		'group'                   => '__do_not_document',
+		'method'                  => 'GET',
+		'path'                    => '/sites/%s/orders/%d/backup',
+		'stat'                    => 'orders:1:backup',
+		'allow_jetpack_site_auth' => true,
+		'path_labels'             => array(
+			'$site'  => '(int|string) The site ID, The site domain',
+			'$order' => '(int) The order ID',
+		),
+		'response_format'         => array(
+			'order' => '(array) Post table row',
+		),
+		'example_request_data'    => array(
+			'headers' => array(
+				'authorization' => 'Bearer YOUR_API_TOKEN',
+			),
+		),
+		'example_request'         => 'https://public-api.wordpress.com/rest/v1/sites/example.wordpress.org/orders/1/backup',
+	)
+);
+
 // GET /sites/%s/terms/%d/backup
 require_once $json_jetpack_endpoints_dir . 'class.jetpack-json-api-get-term-backup-endpoint.php';
 new Jetpack_JSON_API_Get_Term_Backup_Endpoint(
