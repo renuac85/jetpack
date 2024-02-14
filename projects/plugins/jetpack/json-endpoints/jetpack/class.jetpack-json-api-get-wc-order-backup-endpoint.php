@@ -1,5 +1,7 @@
 <?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
 
+use Automattic\Jetpack\Sync\Modules\WooCommerce_HPOS_Orders;
+
 /**
  * Get orders backup endpoint class.
  *
