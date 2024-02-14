@@ -15,7 +15,6 @@ namespace Automattic\Jetpack\Backup\V0002;
 use Automattic\Jetpack\Connection\Client;
 use Automattic\Jetpack\Connection\Rest_Authentication;
 use Automattic\Jetpack\Sync\Actions as Sync_Actions;
-use Automattic\Jetpack\Sync\Modules\WooCommerce_HPOS_Orders;
 use Jetpack_Options;
 use WP_Error;
 use WP_REST_Request;
@@ -644,7 +643,7 @@ class REST_Controller {
 		Sync_Actions::mark_sync_read_only();
 
 		$order_id = $request['id'];
-		$order    = WooCommerce_HPOS_Orders::get_object_by_id( 'order', $order_id );
+		$order    = wc_get_order( $order_id );
 
 		if ( empty( $order ) ) {
 			return new WP_Error( 'order_not_found', __( 'Order not found ', 'jetpack-backup-pkg' ), array( 'status' => 404 ) );
